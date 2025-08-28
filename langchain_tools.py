@@ -5,6 +5,7 @@ from typing import Dict, Any, Optional, List
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from constant import (
     BIOMARKER_WEIGHTS,
     TOP_K,
@@ -16,6 +17,7 @@ from prompt import (
     generate_prompt_with_all_possible_parameters,
 )
 from dotenv import load_dotenv
+import os
 import logging
 from logging_config import setup_logging
 from utils import get_patient_data, create_or_get_chroma_client
@@ -25,7 +27,11 @@ load_dotenv()
 setup_logging()
 logger = logging.getLogger("langchain_tools")
 
-
+model = ChatGroq(
+        temperature=0.0,
+        model_name="llama3-8b-8192",
+        api_key=os.getenv("GROQ_API", None)
+    )
 @tool
 def get_patient_data_by_id(id: str) -> Dict:
     """This method used to fetch patient details based upon given patient_id.
@@ -189,8 +195,8 @@ def process_claim_details_and_decide_claim_status(json_context: str) -> Dict[str
         },
     )
 
-    llm = ChatOpenAI(model="gpt-4o", temperature=0)
-    chain = prompt | llm | parser
+    # llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    chain = prompt | model | parser
     response_dict = chain.invoke(
         {"patient_medical_history": context["patient_medical_history"]}
     )
@@ -219,8 +225,8 @@ def provide_additional_claim_response_using_pubmed_and_guideline_api(
         },
     )
 
-    llm = ChatOpenAI(model="gpt-4o", temperature=0)
-    chain = prompt | llm | parser
+    # llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    chain = prompt | model | parser
     response_dict = chain.invoke(
         {"patient_medical_history": context["patient_medical_history"]}
     )

@@ -346,7 +346,7 @@ def involve_human_review_agent(state: AgentState):
         )
         llm_provided_detailed_summary = state.get("llm_provided_detailed_summary")
         human_review_content = {
-            "question": "Do you want to approve or require additional "
+            "question": "Do you want to approve, reject or require additional "
             "information for below claim details ?",
             "claim": f"""patient medical history: {json.dumps(patient_medical_details)} 
             showing risk score as: {json.dumps(risk_score)}
